@@ -24,7 +24,11 @@
 extern "C" {
 #endif
 
+void init_temp_timer(void);
+
+uint8_t get_temp_readings_buff_size(void);
 int16_t get_temp_measurement(void);
+uint8_t get_temp_readings(int16_t *);
 
 #ifdef __cplusplus
 }

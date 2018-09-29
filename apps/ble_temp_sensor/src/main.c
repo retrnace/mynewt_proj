@@ -31,6 +31,7 @@
 
 #include "ble_temp_sensor.h"
 #include "gatt_svr.h"
+#include "temp.h"
 
 /* Log data */
 struct log logger;
@@ -40,6 +41,24 @@ static const char *device_name = "ble_temp_sensor";
 static int ble_temp_gap_event(struct ble_gap_event *event, void *arg);
 
 static uint8_t ble_temp_addr_type;
+
+/* Define task stack and task object */
+#define TEMP_TASK_PRIO        (OS_TASK_PRI_LOWEST - 1)  // TODO:change to lowest
+#define TEMP_STACK_SIZE       (1024)
+
+#define TEMP_TIMER_PERIOD			(OS_TICKS_PER_SEC/10) // 10Hz
+ 
+struct os_task temp_task; 
+os_stack_t temp_task_stack[TEMP_STACK_SIZE]; 
+
+/* This is the temp task function */
+void temp_task_func(void *arg) {
+		
+		init_temp_timer();
+    /* The task is a forever loop that does not return */
+    while (1) {
+    }
+}
 
 /*
  * Enables advertising with parameters:
@@ -155,6 +174,12 @@ on_sync(void)
     LOG(INFO, "adv started\n");
 }
 
+static void
+on_reset(int reason)
+{
+	LOG(INFO, "Stack reset, reason = %d\n", reason);
+}
+
 /*
  * main
  *
@@ -174,11 +199,13 @@ main(void)
     /* Initialize the logger */
     log_register("ble_temp_sensor_log", &logger, &log_console_handler, NULL, LOG_SYSLEVEL);
 
+		LOG(INFO, "STARTING UP\n");
     /* Prepare the internal temperature module for measurement */
     nrf_temp_init();
 
     /* Prepare BLE host and GATT server */
     ble_hs_cfg.sync_cb = on_sync;
+		ble_hs_cfg.reset_cb = on_reset;
     ble_hs_cfg.gatts_register_cb = gatt_svr_register_cb;
 
     rc = gatt_svr_init();
@@ -187,6 +214,10 @@ main(void)
     /* Set the default device name */
     rc = ble_svc_gap_device_name_set(device_name);
     assert(rc == 0);
+
+    /* Initialize the task */
+    os_task_init(&temp_task, "temp_task", temp_task_func, NULL, TEMP_TASK_PRIO, 
+                 OS_WAIT_FOREVER, temp_task_stack, TEMP_STACK_SIZE);
 
     /* As the last thing, process events from default event queue */
     while (1) {
