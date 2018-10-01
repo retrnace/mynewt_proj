@@ -43,7 +43,7 @@ static int ble_temp_gap_event(struct ble_gap_event *event, void *arg);
 static uint8_t ble_temp_addr_type;
 
 /* Define task stack and task object */
-#define TEMP_TASK_PRIO        (OS_TASK_PRI_LOWEST - 1)  // TODO:change to lowest
+#define TEMP_TASK_PRIO        (OS_TASK_PRI_LOWEST - 1) 
 #define TEMP_STACK_SIZE       (1024)
 
 #define TEMP_TIMER_PERIOD			(OS_TICKS_PER_SEC/10) // 10Hz
@@ -214,10 +214,15 @@ main(void)
     /* Set the default device name */
     rc = ble_svc_gap_device_name_set(device_name);
     assert(rc == 0);
+		
+		init_temp_timer();
 
-    /* Initialize the task */
+#if 0 // create a task to handle temperature sensor functions if needed
+    
+		/* Initialize the task */
     os_task_init(&temp_task, "temp_task", temp_task_func, NULL, TEMP_TASK_PRIO, 
-                 OS_WAIT_FOREVER, temp_task_stack, TEMP_STACK_SIZE);
+                OS_WAIT_FOREVER, temp_task_stack, TEMP_STACK_SIZE);
+#endif
 
     /* As the last thing, process events from default event queue */
     while (1) {

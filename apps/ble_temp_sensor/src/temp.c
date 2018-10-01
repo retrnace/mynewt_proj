@@ -92,21 +92,22 @@ get_temp_readings_buff_size(void){
 	return NUM_TEMP_READINGS;
 } 
 
-/* returns the get_temp_readings_buff_size() most recent temperature readings, 
+/* returns the (S) number of most recent temperature readings, 
  * sampled over the previous 1-second period at a rate of 10Hz (one sample every 100ms) 
  * 
- * param buff[get_temp_readings_buff_size()]
+ * param buff: uint8_t array of size S 
+ * param S: size of input buffer
  * return:  number of samples in buffer
  */
 uint8_t 
-get_temp_readings(int16_t * buff)
+get_temp_readings(int16_t * buff, uint8_t S)
 {
-	if(!buff)
+	if(!buff || S > NUM_TEMP_READINGS)
 		return -1;
 
 	int i = 0;
 	int tmp_index;
-	while( i < NUM_TEMP_READINGS){
+	while( i < S){
 					tmp_index = (0 <= (temp_readings_tail_index - i)) ? temp_readings_tail_index - i : 
 														NUM_TEMP_READINGS + (temp_readings_tail_index - i); 
 					
@@ -114,6 +115,6 @@ get_temp_readings(int16_t * buff)
 					i++;
 	}
 
-	return NUM_TEMP_READINGS;
+	return S;
 } 
 

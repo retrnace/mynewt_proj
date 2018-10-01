@@ -73,7 +73,7 @@ gatt_svr_chr_cb(
 
     LOG(INFO, "read value= \n");	
 
-		get_temp_readings(&temp_buff[0]);
+		get_temp_readings(&temp_buff[0], NUM_TEMP_READINGS);
 		while(i < NUM_TEMP_READINGS){
 			LOG(INFO, "%d ", temp_buff[i++]);
 		}		
