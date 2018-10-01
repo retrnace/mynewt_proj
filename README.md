@@ -1,21 +1,25 @@
 # BLE Temperature Sensor
 
-## Overview
+## task
 
-This is a skeleton for an Apache Mynewt project implementing a temperature sensor.
-You will need the Apache Newt tool, as documented in the [Getting Started Guide](http://mynewt.apache.org/os/get_started/introduction/).
+Using the provided RedBear 2 kit, implement a BLE temperature sensor. The nRF52 SoC has an on-die temperature sensor peripheral.
 
-## Code
+The temperature data should be exposed to a BLE central client such as nRF Connect or LightBlue via a GATT service that includes a single temperature characteristic.
 
-The source files are located in [apps/ble_temp_sensor](apps/ble_temp_sensor):
+When the temperature characteristic is read by a central client, it should respond with a serialized binary blob that represents the 10 most recent temperature readings, sampled over the previous 1-second period at a rate of 10Hz (one sample every 100ms).
 
-  * pkg.yml contains the base definition of the app
-  * syscfg.yml contains setting definitions and overrides
-  * src/main.c is the main entry point of the application
-  * src/temp.c implements the temperature sensing functionality
-  * src/gatt_svr.c implements the basic BLE GATT server functionality
+For example, a result of
 
-The available targets are specified in [targets/](targets/).
+(0x) 98 08 7f 08 98 08 b1 08 ca 08 ca 08 7f 08 fc 08 60 09 47 09
+
+corresponds to the following historical temperature readings (freshest to oldest, LE byte order per sample):
+
+2200 2175 2200 2225 2250 2250 2175 2300 2400 2375
+
+taken at time offsets t0, (t0 - 100ms), (t0 - 200ms),..
+
+where each temperature sample above is a 16 bit little endian integer (representing temperature in Degrees Celcius to two decimal places).
+
 
 ## Build
 
@@ -59,20 +63,6 @@ to know how the sausage is made (you could also use JLink to similar effect):
         -c 'exit'
 ```
 
-Here is some sample serial console output from a typical client session:
+Proof of task completion via UART console output and via screenshots from the nRF Connect App. 
 
-```no-highlight
-000000 [ts=0ssb, mod=64 level=0] registered service 0x1800 with handle=1
-000001 [ts=7812ssb, mod=64 level=0] registered characteristic 0x2a00 with def_handle=2 val_handle=3
-000004 [ts=31248ssb, mod=64 level=0] registered characteristic 0x2a01 with def_handle=4 val_handle=5
-000008 [ts=62496ssb, mod=64 level=0] registered characteristic 0x2a05 with def_handle=7 val_handle=8
-000011 [ts=85932ssb, mod=64 level=0] registered service 5c3a659e-897e-45e1-b016-007107c96df6 with handle=10
-000013 [ts=101556ssb, mod=64 level=0] registered characteristic 5c3a659e-897e-45e1-b016-007107c96df7 with def_handle=11 val_handle=12
-000018 [ts=140616ssb, mod=64 level=1] adv started
-000679 [ts=5304668ssb, mod=64 level=1] connection established; status=0
-001394 [ts=10890568ssb, mod=64 level=1] read value=2875
-001468 [ts=11468720ssb, mod=64 level=1] read value=2875
-001543 [ts=12054684ssb, mod=64 level=1] read value=2875
-001578 [ts=12328104ssb, mod=64 level=1] read value=2850
-001970 [ts=15390600ssb, mod=64 level=1] disconnect; reason=531
-```
+
