@@ -15,7 +15,6 @@
 
 
 #define TEMP_TIMER_PERIOD     (OS_TICKS_PER_SEC/10) // 10Hz
-#define NUM_TEMP_READINGS			10
 
 /* The timer callout */
 static struct os_callout temp_callout;

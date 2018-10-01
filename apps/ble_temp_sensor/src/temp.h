@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+#define NUM_TEMP_READINGS     10
+
 void init_temp_timer(void);
 
 uint8_t get_temp_readings_buff_size(void);

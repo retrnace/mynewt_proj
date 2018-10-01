@@ -69,16 +69,16 @@ gatt_svr_chr_cb(
 {
     int rc;
 		int i = 0;
-    int16_t temp_buff[get_temp_readings_buff_size()];
+    int16_t temp_buff[NUM_TEMP_READINGS];
 
     LOG(INFO, "read value= \n");	
 
 		get_temp_readings(&temp_buff[0]);
-		while(i < get_temp_readings_buff_size()){
+		while(i < NUM_TEMP_READINGS){
 			LOG(INFO, "%d ", temp_buff[i++]);
 		}		
 		LOG(INFO, "\n");
-    rc = os_mbuf_append(ctxt->om, &temp_buff[0], get_temp_readings_buff_size()*sizeof(int16_t));
+    rc = os_mbuf_append(ctxt->om, &temp_buff[0], NUM_TEMP_READINGS*sizeof(int16_t));
 
     return rc;
 }
